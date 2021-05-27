@@ -1,0 +1,16 @@
+{
+  "private": true,
+  "scripts": {
+    "dev": "slidev --open",
+    "build": "slidev build",
+    "export": "slidev export"
+  },
+  "dependencies": {
+    "@slidev/cli": "^0.14.1",
+    "@slidev/theme-apple-basic": "^0.14.0",
+    "@slidev/theme-default": "*",
+    "@slidev/theme-seriph": "*",
+    "slidev-theme-unicorn": "^1.0.16"
+  },
+  "name": "hands-on-nlp-hugging-face"
+}
