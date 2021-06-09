@@ -91,7 +91,7 @@ The [Spanish Billion Words Corpus](https://crscardellino.github.io/SBWCE/):
 
 <br>
 
-<img style="height: 200px" class="rounded" src="spanish_billion_words.png">
+<img style="height: 200px" class="rounded" src="https://github.com/mariagrandury/hands-on-nlp-hugging-face/raw/main/spanish_billion_words.png">
 
 </div>
 <div>
