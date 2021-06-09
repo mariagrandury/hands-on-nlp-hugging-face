@@ -7,7 +7,6 @@ info: |
 
   [My personal website](https://mariagrandury.github.io)
 website: 'mariagrandury.github.io'
-handle: 'mariagrandury'
 ---
 
 <div grid="~ cols-2" class="place-items-center">
@@ -37,7 +36,6 @@ The last comment block of each slide will be treated as slide notes. It will be 
 
 ---
 website: 'mariagrandury.github.io'
-handle: 'mariagrandury'
 ---
 
 <div grid="~ cols-2 gap-4">
@@ -61,18 +59,21 @@ handle: 'mariagrandury'
 
 <h1>About this talk</h1>
 
-* Intro to 🤗 libraries
-
 * Train a Language Model: Spanish
 
-* Fine-tune 
+* EsBERTa (RoBERTa-like)
+
+* 🤗 Datasets
+
+* 🤗 Tokenizers
+
+* 🤗 Transformers
 
 </div>
 
 </div>
 
 ---
-website: 'mariagrandury.github.io'
 handle: 'mariagrandury'
 ---
 
@@ -115,7 +116,6 @@ profundidad de sentimientos del resto de la familia...}
 </div>
 
 ---
-website: 'mariagrandury.github.io'
 handle: 'mariagrandury'
 ---
 
@@ -133,7 +133,8 @@ Tokenizing:
 
 [🤗 Tokenizers](https://github.com/huggingface/tokenizers)
 
-* Byte-Pair Encoding (BPE): GPT-2, RoBERTa
+* Byte-Pair Encoding (BPE)
+* Byte-Level BPE: GPT-2, RoBERTa
 * WordPiece: BERT, ELECTRA
 * SentencePiece: T5, ALBERT
 
@@ -177,11 +178,14 @@ Tokenizing:
 </div>
 
 ---
-website: 'mariagrandury.github.io'
-handle: 'mariagrandury'
+website: ''
+handle: ''
 ---
 
 # Train the Tokenizer
+
+<div grid="~ cols-2 gap-4">
+<div>
 
 ```py {1-5|13|7-13|12-19|21-22|all}
 from tokenizers import ByteLevelBPETokenizer
@@ -208,8 +212,43 @@ tokenizer.train_from_iterator(
 tokenizer.save_model("EsBERTa")
 ```
 
+</div>
+
+<v-click>
+<div>
+<div>
+
+```py {all}
+tokenizer.encode(
+  "Buenos dias, me llamo Maria."
+).tokens
+
+> ['<s>',
+  'Buenos', 'Ġdias', ',',
+  'Ġme', 'Ġllamo',
+  'ĠMaria', '.',
+  '</s>']
+
+
+tokenizer.encode(
+  "estrambotico, despampanante, genialidad"
+).tokens
+
+> ['<s>',
+  'estr', 'amb', 'ot', 'ico',
+  ',',
+  'Ġdesp', 'am', 'pan', 'ante',
+  ',',
+  'Ġgen', 'ialidad',
+  '</s>']
+``` 
+</div>
+</div>
+</v-click>
+
+</div>
+
 ---
-website: 'mariagrandury.github.io'
 handle: 'mariagrandury'
 ---
 
@@ -225,9 +264,9 @@ handle: 'mariagrandury'
 ## Advantages:
 * All-to-all comparisons: parallelization!
 * Better performance & speed
-* Capture longer dependencies
+* ReLU > sigmoid, tanh
 * Transfer learning: re-usable models
-* [🤗 Transformers](https://github.com/huggingface/transformers)
+* [🤗 Transformers](https://github.com/huggingface/transformers) (47k ⭐)
 
 </div>
 
@@ -235,13 +274,34 @@ handle: 'mariagrandury'
 </div>
 
 ---
-website: 'mariagrandury.github.io'
 handle: 'mariagrandury'
 ---
 
 # Configure and initialize the model
 
-```py {1,5-12|2,14-15|3,17-18|all}
+
+<div grid="~ cols-2 gap-4">
+<div>
+
+## RoBERTa
+
+<br>
+
+[RoBERTa: A Robustly Optimized BERT Pretraining Approach](https://arxiv.org/abs/1907.11692)
+
+<br>
+
+Based on Google’s BERT model (2018)
+- modified key hyperparameters
+- removed the next-sentence pretraining objective
+- much larger mini-batches and learning rates
+
+</div>
+
+
+<div>
+
+```py {4|1,5-12|2,14-15|3,17-18|all}
 from transformers import RobertaConfig
 from transformers import RobertaTokenizerFast
 from transformers import RobertaForMaskedLM
@@ -256,15 +316,19 @@ config = RobertaConfig(
 )
 
 # Create the tokenizer (Byte-Level BPE)
-tokenizer = RobertaTokenizerFast.from_pretrained("./EsBERTa", max_len=512)
+tokenizer = RobertaTokenizerFast.from_pretrained(
+  "./EsBERTa", max_len=512
+)
 
 # Initialize the model from the config
 model = RobertaForMaskedLM(config=config)
 ```
 
+</div>
+
+</div>
+
 ---
-colorSchema: 'light'
-website: 'mariagrandury.github.io'
 handle: 'mariagrandury'
 ---
 
@@ -273,7 +337,7 @@ handle: 'mariagrandury'
 <div grid="~ cols-2 gap-4">
 <div>
 
-```py {1, 5-6|2,8-13|3,15-18|all}
+```py {all}
 from transformers import DataCollatorForLanguageModeling
 from transformers import Trainer, TrainingArguments
 
@@ -298,7 +362,7 @@ data_collator = DataCollatorForLanguageModeling(
 
 <div>
 
-```py {1-9|11-16|18|19|all}
+```py {all}
 training_args = TrainingArguments(
     output_dir="./EsBERTa",
     overwrite_output_dir=True,
@@ -310,10 +374,10 @@ training_args = TrainingArguments(
 )
 
 trainer = Trainer(
-    model=model,
-    args=training_args,
-    data_collator=data_collator,
     train_dataset=dataset,
+    data_collator=data_collator,
+    args=training_args,
+    model=model,
 )
 
 trainer.train()
@@ -325,11 +389,13 @@ trainer.save_model("./EsBERTa")
 
 ---
 layout: center
-logoHeader: 'https://huggingface.co/front/assets/huggingface_logo.svg'
 website: 'mariagrandury.github.io'
 handle: 'mariagrandury'
 ---
 
 # Thank you!
+
+<img style="height: 200px" src="https://huggingface.co/front/assets/huggingface_logo.svg">
+
 
 ---
