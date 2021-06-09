@@ -12,13 +12,13 @@ handle: 'mariagrandury'
 
 <div grid="~ cols-2" class="place-items-center">
 
-<img style="height: 250px" src="https://huggingface.co/front/assets/huggingface_logo.svg">
+<img style="height: 200px" src="https://huggingface.co/front/assets/huggingface_logo.svg">
 
 <div>
 
 # Hands-on NLP with Hugging Face
 
-## WomenTech Global Conference
+## María Grandury
 
 </div>
 
@@ -36,14 +36,113 @@ The last comment block of each slide will be treated as slide notes. It will be 
 -->
 
 ---
-
-# Huggingface Tokenizers
+website: 'mariagrandury.github.io'
+handle: 'mariagrandury'
+---
 
 <div grid="~ cols-2 gap-4">
 <div>
 
-https://github.com/huggingface/tokenizers
+<h1>About me</h1>
 
+* 💡  Machine Learning Research Engineer
+
+* 🎯  NLP, AI Robustness & Explainability
+
+* 🎓  Mathematics & Physics
+
+* 👩🏻‍💻  Trusted AI **@neurocat_GmbH**
+
+* 🚀  Founder **@NLP_en_ES 🤗**
+
+</div>
+
+<div>
+
+<h1>About this talk</h1>
+
+* Intro to 🤗 libraries
+
+* Train a Language Model: Spanish
+
+* Fine-tune 
+
+</div>
+
+</div>
+
+---
+website: 'mariagrandury.github.io'
+handle: 'mariagrandury'
+---
+
+# Choose the Data Set
+
+<div grid="~ cols-2 gap-4">
+<div>
+
+<br>
+
+The [Spanish Billion Words Corpus](https://crscardellino.github.io/SBWCE/):
+
+- unannotated Spanish corpus
+- ~1.5 billion words
+- it's in [🤗 Datasets](https://huggingface.co/datasets/spanish_billion_words)!
+
+<br>
+
+<img style="height: 200px" class="rounded" src="spanish_billion_words.png">
+
+</div>
+<div>
+
+```py {1-3|6-7|10-12|all}
+from datasets import load_dataset
+
+dataset = load_dataset("spanish_billion_words")
+
+
+print(len(dataset))
+>> 14077588
+
+
+print(dataset[23])
+>> {'text': 'El señor John Dashwood no tenía la \
+profundidad de sentimientos del resto de la familia...}
+```
+
+</div>
+</div>
+
+---
+website: 'mariagrandury.github.io'
+handle: 'mariagrandury'
+---
+
+# Tokenize the Text
+
+<div grid="~ cols-2 gap-4">
+<div>
+
+Tokenizing:
+
+* Split a text into (sub)words
+* Convert to IDs through a look-up table
+
+<br>
+
+[🤗 Tokenizers](https://github.com/huggingface/tokenizers)
+
+* Byte-Pair Encoding (BPE): GPT-2, RoBERTa
+* WordPiece: BERT, ELECTRA
+* SentencePiece: T5, ALBERT
+
+</div>
+
+<div>
+
+<v-click>
+<div>
 💥 Fast State-of-the-Art Tokenizers optimized for Research and Production.
 
 * Word tokenization
@@ -52,49 +151,66 @@ https://github.com/huggingface/tokenizers
   * Pad
   * Add the special tokens
 
-<v-click>
-Thanks to Rust its extremly fast!
-
-<img src="https://www.rust-lang.org/static/images/rust-logo-blk.svg">
+</div>
 </v-click>
 
-</div>
 <v-click>
 <div>
 
-<img class="rounded" src="https://i.gifer.com/41C.gif">
+* Thanks to Rust it is extremly fast!
+
+<br>
+
+<div grid="~ cols-2">
+<div>
+<img style="height: 100px; margin-left: 50px" src="https://www.rust-lang.org/static/images/rust-logo-blk.svg">
+</div>
+<div>
+<img style="height: 100px" class="rounded" src="https://i.gifer.com/41C.gif">
+</div>
+</div>
 
 </div>
 </v-click>
+
+</div>
 </div>
 
 ---
+website: 'mariagrandury.github.io'
+handle: 'mariagrandury'
+---
 
-# Train a Tokenizer
+# Train the Tokenizer
 
-```py {1-5|7-8|10-18|20-21|all}
-from pathlib import Path
-
+```py {1-5|13|7-13|12-19|21-22|all}
 from tokenizers import ByteLevelBPETokenizer
 
-paths = [str(x) for x in Path(".").glob("**/*.txt")]
 
 # Initialize a tokenizer
 tokenizer = ByteLevelBPETokenizer()
 
+# Create iterator
+def batch_iterator(batch_size=1000):
+  for i in range(0, len(dataset), batch_size):
+    yield dataset[i : i + batch_size]["text"]
+
 # Customize training
-tokenizer.train(files=paths, vocab_size=52_000, min_frequency=2, special_tokens=[
-    "<s>",
-    "<pad>",
-    "</s>",
-    "<unk>",
-    "<mask>",
-])
+tokenizer.train_from_iterator(
+  iterator=batch_iterator,
+  vocab_size=52_000,
+  special_tokens=[
+    "<s>", "</s>", "<pad>", "<unk>", "<mask>"
+  ]
+)
 
 # Save files to disk
-tokenizer.save_model("EsperBERTo")
-``` 
+tokenizer.save_model("EsBERTa")
+```
 
+---
+website: 'mariagrandury.github.io'
+handle: 'mariagrandury'
 ---
 
 <div grid="~ cols-2">
@@ -102,32 +218,33 @@ tokenizer.save_model("EsperBERTo")
 
 # Transformers
 
-https://github.com/huggingface/transformers
-
-## Advantages w.r.t. RNNs:
-* more easily parallelized
-* better performance & speed
-* capture much longer dependencies
-* transfer learning
-* coolerr name
-
-## Architecture:
+## 2 Key Innovations:
 * Positional Encoding
-* Masking
 * Multi-Head Attention
+
+## Advantages:
+* All-to-all comparisons: parallelization!
+* Better performance & speed
+* Capture longer dependencies
+* Transfer learning: re-usable models
+* [🤗 Transformers](https://github.com/huggingface/transformers)
+
 </div>
 
-<img border="rounded" src="https://miro.medium.com/max/700/1*BHzGVskWGS_3jEcYYi6miQ.png">
+<img style="height: 400px" border="rounded" src="https://miro.medium.com/max/700/1*BHzGVskWGS_3jEcYYi6miQ.png">
 </div>
 
+---
+website: 'mariagrandury.github.io'
+handle: 'mariagrandury'
 ---
 
 # Configure and initialize the model
 
 ```py {1,5-12|2,14-15|3,17-18|all}
-from transformers import RobertaForMaskedLM
 from transformers import RobertaConfig
 from transformers import RobertaTokenizerFast
+from transformers import RobertaForMaskedLM
 
 # Configure the model
 config = RobertaConfig(
@@ -138,47 +255,52 @@ config = RobertaConfig(
     type_vocab_size=1,
 )
 
-# Create the tokenizer
-tokenizer = RobertaTokenizerFast.from_pretrained("./EsperBERTo", max_len=512)
+# Create the tokenizer (Byte-Level BPE)
+tokenizer = RobertaTokenizerFast.from_pretrained("./EsBERTa", max_len=512)
 
 # Initialize the model from the config
 model = RobertaForMaskedLM(config=config)
 ```
 
 ---
+colorSchema: 'light'
+website: 'mariagrandury.github.io'
+handle: 'mariagrandury'
+---
 
-# Build the Training Dataset
+# Train the Language Model
+
+<div grid="~ cols-2 gap-4">
+<div>
 
 ```py {1, 5-6|2,8-13|3,15-18|all}
-from transformers import RobertaTokenizerFast
-from transformers import LineByLineTextDataset
 from transformers import DataCollatorForLanguageModeling
+from transformers import Trainer, TrainingArguments
 
 
-tokenizer = RobertaTokenizerFast.from_pretrained("./EsperBERTo", max_len=512)
+def encode(examples):
+  return tokenizer(
+    examples['text'],
+    truncation=True,
+    padding='max_length'
+  )
 
-
-dataset = LineByLineTextDataset(
-    tokenizer=tokenizer,
-    file_path="./oscar.eo.txt",
-    block_size=128,
-)
+dataset = dataset.map(encode, batched=True)
 
 
 data_collator = DataCollatorForLanguageModeling(
-    tokenizer=tokenizer, mlm=True, mlm_probability=0.15
+    tokenizer=tokenizer,
+    mlm=True,
+    mlm_probability=0.15
 )
 ```
+</div>
 
----
+<div>
 
-# Train a Language Model
-
-```py {1|3-11|13-18|20|21|all}
-from transformers import Trainer, TrainingArguments
-
+```py {1-9|11-16|18|19|all}
 training_args = TrainingArguments(
-    output_dir="./EsperBERTo",
+    output_dir="./EsBERTa",
     overwrite_output_dir=True,
     num_train_epochs=1,
     per_gpu_train_batch_size=64,
@@ -195,33 +317,11 @@ trainer = Trainer(
 )
 
 trainer.train()
-trainer.save_model("./EsperBERTo")
+trainer.save_model("./EsBERTa")
 ```
+</div>
 
----
-
-# Fine-tune the LM on a downstream task
-
-```py {1|4-10|12-18|all}
-from transformers import TokenClassificationPipeline, pipeline
-
-
-MODEL_PATH = "./models/EsperBERTo-small-pos/"
-
-nlp = pipeline(
-    "ner",
-    model=MODEL_PATH,
-    tokenizer=MODEL_PATH,
-)
-
-nlp("Mi estas viro kej estas tago varma.")
-
-# {'entity': 'PRON', 'score': 0.9979867339134216, 'word': ' Mi'}
-# {'entity': 'VERB', 'score': 0.9683094620704651, 'word': ' estas'}
-# {'entity': 'VERB', 'score': 0.9797462821006775, 'word': ' estas'}
-# {'entity': 'NOUN', 'score': 0.8509314060211182, 'word': ' tago'}
-# {'entity': 'ADJ', 'score': 0.9996201395988464, 'word': ' varma'}
-```
+</div>
 
 ---
 layout: center
@@ -230,8 +330,6 @@ website: 'mariagrandury.github.io'
 handle: 'mariagrandury'
 ---
 
-# Thank you
-
-link to hugging face repo
+# Thank you!
 
 ---
