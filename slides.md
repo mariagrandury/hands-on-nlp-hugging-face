@@ -1,13 +1,20 @@
 ---
 theme: unicorn
 highlighter: shiki
+
 info: |
   ## Hands-on NLP with Hugging Face
   by María Grandury
 
   [My personal website](https://mariagrandury.github.io)
+
 website: 'mariagrandury.github.io'
 ---
+
+<a href="https://github.com/mariagrandury" target="_blank" alt="GitHub"
+  class="abs-tr m-6 text-3xl icon-btn opacity-50 !border-none !hover:text-white">
+  <carbon-logo-github />
+</a>
 
 <div grid="~ cols-2" class="place-items-center">
 
@@ -21,18 +28,7 @@ website: 'mariagrandury.github.io'
 
 </div>
 
-
 </div>
-
-<a href="https://github.com/mariagrandury" target="_blank" alt="GitHub"
-  class="abs-tr m-6 text-3xl icon-btn opacity-50 !border-none !hover:text-white">
-  <carbon-logo-github />
-</a>
-
-
-<!--
-The last comment block of each slide will be treated as slide notes. It will be visible and editable in Presenter Mode along with the slide. [Read more in the docs](https://sli.dev/guide/syntax.html#notes)
--->
 
 ---
 website: 'mariagrandury.github.io'
@@ -279,7 +275,6 @@ handle: 'mariagrandury'
 
 # Configure and initialize the model
 
-
 <div grid="~ cols-2 gap-4">
 <div>
 
@@ -297,7 +292,6 @@ Based on Google’s BERT model (2018)
 - much larger mini-batches and learning rates
 
 </div>
-
 
 <div>
 
@@ -390,12 +384,8 @@ trainer.save_model("./EsBERTa")
 ---
 layout: center
 website: 'mariagrandury.github.io'
-handle: 'mariagrandury'
 ---
 
 # Thank you!
 
 <img style="height: 200px" src="https://huggingface.co/front/assets/huggingface_logo.svg">
-
-
----
